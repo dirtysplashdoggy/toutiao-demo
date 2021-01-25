@@ -1,20 +1,24 @@
 <template>
-  <div>
+  <div class="bcc">
     <el-container class="home-container">
       <el-header>
         <div>
           <span>后台管理</span>
         </div>
-        <el-button type="info" @click="logout"> 退出</el-button></el-header
+        <el-button class="quit" type="info" @click="logout"> 退出</el-button></el-header
       >
       <el-container>
-        <el-aside width="200px">
+        <el-aside :width="isFlag ? '64px': '200px'">
+           <div class="button1" @click="toggleiscollapse">|||</div>
           <el-menu
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b"
             unique-opened
-          
+            :collapse = "isFlag"
+            :collapse-transition = "false"
+            :default-active ='$route.path'
+            router
           >
 
             <el-submenu :index="item.id.toString() " v-for="item in menulist" :key="item.id">
@@ -23,7 +27,7 @@
                 <span>{{item.authName}}</span>
               </template>
 
-              <el-menu-item :index='subitem.id.toString()' v-for="(subitem, index) in item.children" :key="subitem.id">
+              <el-menu-item :index="'/'+subitem.path" v-for="(subitem, index) in item.children" :key="subitem.id">
                 <template slot="title">
                   <i class="el-icon-caret-right"></i>
                   <span>{{subitem.authName}}</span>
@@ -33,7 +37,9 @@
           </el-menu>
         </el-aside>
         <el-container>
-          <el-main>Main</el-main>
+          <el-main>
+            <router-view></router-view>
+          </el-main>
         </el-container>
       </el-container>
     </el-container>
@@ -45,7 +51,9 @@ import request from '@/utils/request'
 
 export default {
   data(){
+    
     return{
+      isFlag : false,
       menulist:[],
       iconObj:{
         '125':'el-icon-user',
@@ -56,15 +64,20 @@ export default {
       }
     }
   },
+
   name: "Home",
   components: {},
   methods: {
+
+    toggleiscollapse(){
+      this.isFlag = !this.isFlag
+    },
     getMenuList(){
       request.get('menus').then(res =>{
         // console.log(res);
         if(res.data.data == null) return this.$message.error(res.data.meta.msg)
         this.menulist=res.data.data
-        console.log(this.menulist);
+        // console.log(this.menulist);
         
       })
     },
@@ -83,15 +96,29 @@ export default {
 
 
 <style scoped>
+
+.button1{
+  background-color: #4a5064;
+  font-size: 10px;
+  line-height: 24px;
+  color: #eaedf1;
+  text-align: center;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+}
 .home-container {
   height: 100%;
+}
+.quit{
+  position: fixed;
+  right: 20px;
 }
 
 .el-menu{
  border-right:0
 }
 
-div {
+.bcc{
   height: 100%;
   display: flex;
   align-items: center;
