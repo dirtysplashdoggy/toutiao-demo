@@ -1,6 +1,7 @@
 <!--  -->
 <template>
   <div>
+    <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
@@ -47,54 +48,35 @@
         <el-table-column label="操作" width="175px">
           <template v-slot:default="scope">
             <!-- 编辑图标 -->
-            <el-tooltip
-              transition="none"
-              content="编辑"
-              placement="top"
-              effect="dark"
-              :enterable="false"
-            >
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-                size="mini"
-                @click="showEditDialog(scope.row.id)"
-              ></el-button>
-            </el-tooltip>
+
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showEditDialog(scope.row.id)"
+            ></el-button>
+
             <!-- 删除图标 -->
-            <el-tooltip
-              transition="none"
-              content="删除"
-              placement="top"
-              effect="dark"
-              :enterable="false"
-            >
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                @click="removueUser(scope.row.id)"
-              ></el-button>
-            </el-tooltip>
+
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removueUser(scope.row.id)"
+            ></el-button>
+
             <!-- 权限管理图标 -->
-            <el-tooltip
-              transition="none"
-              content="权限管理"
-              placement="top"
-              effect="dark"
-              :enterable="false"
-            >
-              <el-button
-                type="warning"
-                icon="el-icon-setting"
-                size="mini"
-                @click=""
-              ></el-button>
-            </el-tooltip>
+
+            <el-button
+              type="warning"
+              icon="el-icon-setting"
+              size="mini"
+              @click="setRole(scope.row)"
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
-
+      <!-- 分页 -->
       <el-pagination
         @size-change="sizeChange"
         @current-change="currentChange"
@@ -176,6 +158,33 @@
         <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      title="分配角色"
+      :visible.sync="EditRoleDialogVisible"
+      width="50%"
+      @close=""
+    >
+      <div>
+        <p>当前用户：{{ userinfo.username }}</p>
+        <p>当前角色：{{ userinfo.role_name }}</p>
+        <p>分配新角色：
+          <el-select v-model="selectedRoleID"  placeholder="请选择" >
+            <el-option v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+          
+        </p>
+      </div>
+
+      <span slot="footer">
+        <el-button @click="EditRoleDialogClose">取消</el-button>
+        <el-button type="primary" @click="uploadRole">确认</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -193,6 +202,9 @@ export default {
     };
 
     return {
+      selectedRoleID:'',
+      rolesList:[],
+      userinfo: {},
       editForm: [],
       addform: {
         username: "",
@@ -250,6 +262,7 @@ export default {
 
       dialogVisible: false,
       EditdialogVisible: false,
+      EditRoleDialogVisible: false,
     };
   },
 
@@ -287,43 +300,38 @@ export default {
     editUser() {
       this.$refs.editForm.validate((valid) => {
         if (!valid) return;
-        request.put("users/" + this.editForm.id, 
-        {
-          email: this.editForm.email,
-          mobile: this.editForm.mobile
-        }).then((res) => {
-          // console.log(res)
-          this.ifstastus(res.status)
-          this.EditdialogVisible=false
-          this.getUserList()
-          this.$message.success('更新成功')
-    
-        })
-      })
-    },
-    removueUser(id){
-      // console.log(id);
-          this.$confirm('真的要删除此用户吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(()=>{
-          request.delete('users/'+id).then(res=>{
-            // console.log(res);
-            
-                this.ifstastus(res.status)
-                 this.$message.success('删除成功！')
-                 this.getUserList()
-
+        request
+          .put("users/" + this.editForm.id, {
+            email: this.editForm.email,
+            mobile: this.editForm.mobile,
           })
-       
-        }).catch(()=>{
-         
+          .then((res) => {
+            // console.log(res)
+            this.ifstastus(res.status);
+            this.EditdialogVisible = false;
+            this.getUserList();
+            this.$message.success("更新成功");
+          });
+      });
+    },
+    removueUser(id) {
+      // console.log(id);
+      this.$confirm("真的要删除此用户吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          request.delete("users/" + id).then((res) => {
+            // console.log(res);
+
+            this.ifstastus(res.status);
+            this.$message.success("删除成功！");
+            this.getUserList();
+          });
         })
-  
-      
-    }
-    ,
+        .catch(() => {});
+    },
     addDialogClosed() {
       this.$refs.addform.resetFields();
     },
@@ -360,6 +368,33 @@ export default {
       this.queryInfo.pagenum = newPage;
       this.getUserList();
     },
+    setRole(userinfo) {
+      this.userinfo = userinfo;
+      request.get('roles').then(res=>{
+        console.log(res);
+     
+        this.rolesList=res.data.data
+
+
+        this.EditRoleDialogVisible = true;
+    
+      })
+    },
+    uploadRole() {
+      if(!this.selectedRoleID) return this.$message.error('请选择要分配的角色！')
+    
+        
+      request.put(`users/${this.userinfo.id}/role`,{rid:this.selectedRoleID}).then(res=>{
+        console.log(res);
+        
+      })
+      this.EditRoleDialogVisible = false;
+
+    },
+    EditRoleDialogClose(){
+      this.EditRoleDialogVisible=false,
+      this.selectedRoleID=''
+    }
   },
 };
 </script>
