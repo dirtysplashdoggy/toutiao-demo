@@ -5,7 +5,6 @@
 </template>
 
 <script>
-
 </script>
 
 <style>
@@ -18,7 +17,8 @@ body,
   min-width: 1366px;
 }
 
-.el-breadcrumb{
+.el-breadcrumb {
   margin-bottom: 15px;
 }
+
 </style>
