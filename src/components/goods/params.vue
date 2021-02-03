@@ -265,6 +265,7 @@ export default {
   },
   created() {
     this.getCateList();
+  
   },
   computed: {
     //   按钮需要被禁用返回true, 否则返回false
@@ -289,10 +290,11 @@ export default {
     },
   },
   methods: {
-    isSuccess(status,msg){
-        if(status !== 200){
-          this.$message.error(msg)
-        }
+
+    isSuccess(status, msg) {
+      if (status !== 200) {
+        this.$message.error(msg);
+      }
     },
     //   获取所有的商品分类列表
     getCateList() {
@@ -411,10 +413,9 @@ export default {
           request
             .delete(`categories/${this.getCateId}/attributes/${attrId}`)
             .then((res) => {
-
-              this.isSuccess(res.data.meta.status,'删除失败')
+              this.isSuccess(res.data.meta.status, "删除失败");
               console.log(res);
-              
+
               this.$message.success("删除参数成功！");
               this.getParamsData();
             })

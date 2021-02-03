@@ -4,7 +4,7 @@ import axios from 'axios'
 //axios
 
 const request = axios.create({
-    baseURL:'http://timemeetyou.com:8889/api/private/v1/'
+    baseURL:'http://www.ysqorz.top:8888/api/private/v1/'
 })
 
 request.interceptors.request.use(config => {

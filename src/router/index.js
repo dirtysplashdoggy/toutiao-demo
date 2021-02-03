@@ -1,34 +1,43 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Login from '../views/login'
-import Welcome from '../components/welcome.vue'
-import Users from '../components/user/Users.vue'
-import Rights from '../components/power/Rights.vue'
-import Roles from '../components/power/roles.vue'
-import Cate from '../components/goods/Cate.vue'
-import params from '../components/goods/params.vue'
+
+const Home = () => import('../views/Home.vue')
+const Login = () => import('../views/login')
+const Welcome = () => import('../components/welcome.vue')
+const Users = () => import('../components/user/Users.vue')
+const Rights = () => import('../components/power/Rights.vue')
+const Roles = () => import('../components/power/roles.vue')
+const Cate = () => import('../components/goods/Cate.vue')
+const params = () => import('../components/goods/params.vue')
+const list = () => import('../components/goods/list.vue')
+const add = () => import('../components/goods/add.vue')
+const report = () => import('../components/report/report.vue')
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/home', component: Home, redirect:'/welcome',
+    path: '/home', component: Home, redirect: '/welcome',
     children: [
-      { path:'/welcome',component:Welcome},
-      { path:'/users',component:Users},
-      { path:'/rights',component:Rights},
-      { path:'/roles',component:Roles},
-      { path:'/categories',component:Cate},
-      { path:'/params',component:params},
-      
+      { path: '/welcome', component: Welcome },
+      { path: '/users', component: Users },
+      { path: '/rights', component: Rights },
+      { path: '/roles', component: Roles },
+      { path: '/categories', component: Cate },
+      { path: '/params', component: params },
+      { path: '/goods', component: list },
+      { path: '/goods/add', component: add },
+      { path: '/reports', component: report },
+
+
     ]
   },
 
 
   { path: '/login', component: Login },
-  
+
   { path: '/', redirect: '/login' },
+
 ]
 
 const router = new VueRouter({

@@ -21,4 +21,8 @@ body,
   margin-bottom: 15px;
 }
 
+.ql-editor{
+    min-height: 400px;
+}
+
 </style>
